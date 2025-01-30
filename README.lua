@@ -51,7 +51,7 @@ local function executeCardFuse()
 end
 
 -- Toggle para ativar/desativar o Endless
-Tabs.Main:AddToggle("EndlessToggle", {
+local EndlessToggle = Tabs.Main:AddToggle("EndlessToggle", {
     Title = "Endless",
     Description = "Liga/desliga o Endless automaticamente",
     Default = false,
@@ -67,7 +67,7 @@ Tabs.Main:AddToggle("EndlessToggle", {
 })
 
 -- Toggle para ativar/desativar o CardFuse
-Tabs.Main:AddToggle("CardFuseToggle", {
+local CardFuseToggle = Tabs.Main:AddToggle("CardFuseToggle", {
     Title = "CardFuse",
     Description = "Liga/desliga o CardFuse automaticamente",
     Default = false,
