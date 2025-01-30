@@ -1,3 +1,4 @@
+-- Biblioteca
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
 local Window = Fluent:CreateWindow({
@@ -12,11 +13,14 @@ local Tabs = {
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
+-- Descrição
 Tabs.Main:AddParagraph({ Title = "AFE", Content = "CxrloScript" })
 
+-- Variável para controlar o estado do script
 local endlessEnabled = false
 local running = false
 
+-- Função para executar o código quando ativado
 local function executeScript()
     while endlessEnabled and task.wait(1) do -- Loop enquanto estiver ativado
         local args = {
@@ -29,6 +33,7 @@ local function executeScript()
     end
 end
 
+-- Função para alternar ativação (apenas botão)
 local function toggleEndless()
     endlessEnabled = not endlessEnabled -- Alterna entre true e false
 
@@ -44,28 +49,10 @@ local function toggleEndless()
     end
 end
 
+-- Botão para ativar/desativar o script
 Tabs.Main:AddButton({ 
     Title = "Ativar/Desativar Endless", 
     Callback = function() 
         toggleEndless()
-    end 
-})
-
-local Toggle = Tabs.Main:AddToggle("Endless", {
-    Title = "Endless", 
-    Description = "StarGemsFarm",
-    Default = false, 
-    Callback = function(state)
-        endlessEnabled = state
-        if state then
-            print("Toggle Ligado")
-            if not running then
-                running = true
-                task.spawn(executeScript)
-            end
-        else
-            print("Toggle Desligado")
-            running = false
-        end
     end 
 })
