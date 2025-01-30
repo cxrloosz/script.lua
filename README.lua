@@ -32,14 +32,14 @@ local function executeScript()
     end
 end
 
--- Toggle para ativar/desativar Endless
+-- Adicionando o Toggle na interface
 Tabs.Main:AddToggle("EndlessToggle", {
     Title = "Endless",
     Description = "Liga/desliga o script automaticamente",
     Default = false,
     Callback = function(state)
         endlessEnabled = state -- Ativa ou desativa
-        if state then
+        if endlessEnabled then
             print("Endless Script Ligado!")
             task.spawn(executeScript) -- Inicia a execução
         else
