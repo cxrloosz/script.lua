@@ -16,13 +16,12 @@ local Tabs = {
 -- Descrição
 Tabs.Main:AddParagraph({ Title = "AFE", Content = "CxrloScript" })
 
--- Variável para controlar o estado do script
+-- Variável para controle do loop
 local endlessEnabled = false
-local running = false
 
 -- Função para executar o código quando ativado
 local function executeScript()
-    while endlessEnabled and task.wait(1) do -- Loop enquanto estiver ativado
+    while endlessEnabled and task.wait(1) do -- Loop enquanto ativado
         local args = {
             [1] = "/\229\133\179\229\141\161\231\179\187\231\187\159/\229\133\179\229\141\161\229\149\134\228\186\186/\230\140\145\230\136\152\228\184\187\231\186\191?\232\180\173\228\185\176",
             [2] = "/\229\133\179\229\141\161\231\179\187\231\187\159/\228\184\187\231\186\191\229\133\179\229\141\161/\228\184\187\231\186\191\229\156\186\230\153\1759/\228\184\187\231\186\191\229\156\186\230\153\1759-5"
@@ -33,26 +32,18 @@ local function executeScript()
     end
 end
 
--- Função para alternar ativação (apenas botão)
-local function toggleEndless()
-    endlessEnabled = not endlessEnabled -- Alterna entre true e false
-
-    if endlessEnabled then
-        print("Endless Script Ligado!")
-        if not running then
-            running = true
-            task.spawn(executeScript) -- Executa o script em uma thread separada
+-- Toggle para ativar/desativar Endless
+Tabs.Main:AddToggle("EndlessToggle", {
+    Title = "Endless",
+    Description = "Liga/desliga o script automaticamente",
+    Default = false,
+    Callback = function(state)
+        endlessEnabled = state -- Ativa ou desativa
+        if state then
+            print("Endless Script Ligado!")
+            task.spawn(executeScript) -- Inicia a execução
+        else
+            print("Endless Script Desligado!")
         end
-    else
-        print("Endless Script Desligado!")
-        running = false
     end
-end
-
--- Botão para ativar/desativar o script
-Tabs.Main:AddButton({ 
-    Title = "Ativar/Desativar Endless", 
-    Callback = function() 
-        toggleEndless()
-    end 
 })
