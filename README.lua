@@ -1,5 +1,5 @@
 -- Biblioteca
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua")))
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
 local Window = Fluent:CreateWindow({
     Title = "AFEchoes " .. Fluent.Version,
@@ -17,101 +17,57 @@ local Tabs = {
 Tabs.Main:AddParagraph({ Title = "AFE", Content = "CxrloScript" })
 
 -- Variáveis para controle dos loops
-local endlessEnabled = false
-local cardFuseEnabled = false
-local raidBossEnabled = false
+local toggles = {
+    endless = false,
+    cardFuse = false,
+    raidBoss = false
+}
 
--- Função para executar o Endless
-local function executeEndless()
-    while endlessEnabled and task.wait() do -- Reduz o tempo de espera para o mínimo possível
-        local args = {
-            [1] = "/\229\133\179\229\141\161\231\179\187\231\187\159/\229\133\179\229\141\161\229\149\134\228\186\186/\230\140\145\230\136\152\230\183\177\230\184\138?\232\180\173\228\185\176"
-        }
+-- Função genérica para executar ações
+local function executeAction(actionType)
+    while toggles[actionType] and task.wait(actionType == "cardFuse" and 1 or 0) do
+        local args = {}
 
-        game:GetService("ReplicatedStorage").Packages.WuKong.RemoteActionFunction:InvokeServer(unpack(args))
-        print("Endless Executado")
-    end
-end
-
--- Função para executar o CardFuse
-local function executeCardFuse()
-    while cardFuseEnabled and task.wait(1) do -- Define um segundo de atraso
-        local args = {
-            [1] = "/\229\141\161\231\137\140\231\179\187\231\187\159/\229\141\161\231\137\140\229\149\134\228\186\186/\232\158\141\229\144\136\229\141\161\231\137\140?\232\180\173\228\185\176",
-            [2] = "/\229\141\161\231\137\140\231\179\187\231\187\159/\229\141\161\231\137\140\232\131\140\229\140\133/\229\190\161\229\157\130\231\190\142\231\144\180",
-            [3] = "__null__",
-            [4] = {
-                [1] = -30
+        if actionType == "endless" then
+            args = {
+                [1] = "/\229\133\179\229\141\161\231\179\187\231\187\159/\229\133\179\229\141\161\229\149\134\228\186\186/\230\140\145\230\136\152\230\183\177\230\184\138?\232\180\173\228\185\176"
             }
-        }
-
-        game:GetService("ReplicatedStorage").Packages.WuKong.RemoteActionFunction:InvokeServer(unpack(args))
-        print("CardFuse Executado")
-    end
-end
-
--- Função para executar o RaidBoss
-local function executeRaidBoss()
-    while raidBossEnabled and task.wait() do
-        local args = {
-            [1] = "/\229\133\179\229\141\161\231\179\187\231\187\159/\229\133\179\229\141\161\229\149\134\228\186\186/\230\140\145\230\136\152Boss?\232\180\173\228\185\176",
-            [2] = "__null__",
-            [3] = "__null__",
-            [4] = {
-                [1] = 1
+        elseif actionType == "cardFuse" then
+            args = {
+                [1] = "/\229\141\161\231\137\140\231\179\187\231\187\159/\229\141\161\231\137\140\229\149\134\228\186\186/\232\158\141\229\144\136\229\141\161\231\137\140?\232\180\173\228\185\176",
+                [2] = "/\229\141\161\231\137\140\231\179\187\231\187\159/\229\141\161\231\137\140\232\131\140\229\140\133/\229\190\161\229\157\130\231\190\142\231\144\180",
+                [3] = "__null__",
+                [4] = { [1] = -20 }
             }
-        }
-        
+        elseif actionType == "raidBoss" then
+            args = {
+                [1] = "/\229\133\179\229\141\161\231\179\187\231\187\159/\229\133\179\229\141\161\229\149\134\228\186\186/\230\140\145\230\136\152Boss?\232\180\173\228\185\176",
+                [2] = "__null__",
+                [3] = "__null__",
+                [4] = { [1] = 1 }
+            }
+        end
+
         game:GetService("ReplicatedStorage").Packages.WuKong.RemoteActionFunction:InvokeServer(unpack(args))
-        print("RaidBoss Executado")
+        print(actionType .. " Executado")
     end
 end
 
--- Toggle para ativar/desativar o Endless
-local EndlessToggle = Tabs.Main:AddToggle("EndlessToggle", {
-    Title = "Endless",
-    Description = "Liga/desliga o Endless automaticamente",
-    Default = false,
-    Callback = function(state)
-        endlessEnabled = state -- Ativa ou desativa
-        if endlessEnabled then
-            print("Endless Ligado!")
-            task.spawn(executeEndless) -- Inicia a execução
-        else
-            print("Endless Desligado!")
+-- Função para criar toggles
+local function createToggle(id, title, description)
+    return Tabs.Main:AddToggle(id, {
+        Title = title,
+        Description = description,
+        Default = false,
+        Callback = function(state)
+            toggles[id] = state
+            print(title .. (state and " Ligado!" or " Desligado!"))
+            if state then task.spawn(function() executeAction(id) end) end
         end
-    end
-})
+    })
+end
 
--- Toggle para ativar/desativar o CardFuse
-local CardFuseToggle = Tabs.Main:AddToggle("CardFuseToggle", {
-    Title = "CardFuse",
-    Description = "Liga/desliga o CardFuse automaticamente",
-    Default = false,
-    Callback = function(state)
-        cardFuseEnabled = state -- Ativa ou desativa
-        if cardFuseEnabled then
-            print("CardFuse Ligado!")
-            task.spawn(executeCardFuse) -- Inicia a execução
-        else
-            print("CardFuse Desligado!")
-        end
-    end
-})
-
--- Toggle para ativar/desativar o RaidBoss
-local RaidBossToggle = Tabs.Main:AddToggle("RaidBossToggle", {
-    Title = "RaidBoss",
-    Description = "Liga/desliga o RaidBoss automaticamente",
-    Default = false,
-    Callback = function(state)
-        raidBossEnabled = state -- Ativa ou desativa
-        if raidBossEnabled then
-            print("RaidBoss Ligado!")
-            task.spawn(executeRaidBoss) -- Inicia a execução
-        else
-            print("RaidBoss Desligado!")
-        end
-    end
-})
-
+-- Criando os toggles
+createToggle("endless", "Endless", "Liga/desliga o Endless automaticamente")
+createToggle("cardFuse", "CardFuse", "Liga/desliga o CardFuse automaticamente")
+createToggle("raidBoss", "RaidBoss", "Liga/desliga o RaidBoss automaticamente")
